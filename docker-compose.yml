@@ -8,7 +8,7 @@ services:
         restart: unless-stopped
         working_dir: /var/www/
         volumes:
-            - ./laravel:/var/www
+            - ./project:/var/www
         networks:
             - url-shortener
 
@@ -19,7 +19,7 @@ services:
         ports:
             - "8000:80"
         volumes:
-            - ./laravel:/var/www
+            - ./project:/var/www
             - ./docker/nginx/conf.d:/etc/nginx/conf.d/
         networks:
             - url-shortener
