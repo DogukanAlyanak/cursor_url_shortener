@@ -30,6 +30,7 @@
                                     <th>Orijinal URL</th>
                                     <th>Ziyaret</th>
                                     <th>Oluşturulma Tarihi</th>
+                                    <th>İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,6 +48,15 @@
                                     </td>
                                     <td>{{ $url->visits }}</td>
                                     <td>{{ $url->created_at->format('d.m.Y H:i') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary copy-btn" 
+                                                data-url="{{ route('urls.redirect', $url->short_code) }}"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="URL'yi Kopyala">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -58,4 +68,39 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tooltip'leri etkinleştir
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Kopyalama butonlarını ayarla
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(() => {
+                // Tooltip metnini güncelle
+                const tooltip = bootstrap.Tooltip.getInstance(this);
+                const originalTitle = this.getAttribute('data-bs-original-title');
+                
+                this.setAttribute('data-bs-original-title', 'Kopyalandı!');
+                tooltip.show();
+
+                // 2 saniye sonra orijinal metni geri yükle
+                setTimeout(() => {
+                    this.setAttribute('data-bs-original-title', originalTitle);
+                    tooltip.hide();
+                }, 2000);
+            }).catch(err => {
+                console.error('URL kopyalanamadı:', err);
+            });
+        });
+    });
+});
+</script>
+@endpush
 @endsection
