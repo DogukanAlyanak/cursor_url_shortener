@@ -23,7 +23,7 @@ class UrlShortenerController extends Controller
         }
         
         $theme = config('theme.active', 'tema_1');
-        return view("themes.{$theme}.urls.index", compact('urls'));
+        return view("themes.tema_2.urls.index", compact('urls'));
     }
 
     public function create()
