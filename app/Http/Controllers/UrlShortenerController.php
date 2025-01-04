@@ -67,30 +67,24 @@ class UrlShortenerController extends Controller
         $query = Auth::check() ? ShortUrl::where('user_id', Auth::id()) : ShortUrl::query();
 
         // Günlük ziyaret istatistikleri
-        $dailyStats = $query->select(
-            DB::raw('DATE(updated_at) as date'),
-            DB::raw('SUM(visits) as total_visits'),
-            DB::raw('COUNT(*) as total_urls')
-        )
-        ->whereNotNull('updated_at')
-        ->groupBy(DB::raw('DATE(updated_at)'))
-        ->orderBy('date', 'desc')
-        ->limit(7)
-        ->get();
+        $dailyStats = DB::table('short_urls')
+            ->select(
+                DB::raw('DATE(updated_at) as date'),
+                DB::raw('SUM(visits) as total_visits'),
+                DB::raw('COUNT(*) as total_urls')
+            )
+            ->where('user_id', Auth::id())
+            ->whereNotNull('updated_at')
+            ->groupBy(DB::raw('DATE(updated_at)'))
+            ->orderBy(DB::raw('DATE(updated_at)'), 'desc')
+            ->limit(7)
+            ->get();
 
         // En çok ziyaret edilen URLler
-        $topUrls = $query->select([
-            'id',
-            'original_url',
-            'short_code',
-            'visits',
-            'created_at',
-            'updated_at'
-        ])
-        ->where('visits', '>', 0)
-        ->orderBy('visits', 'desc')
-        ->limit(5)
-        ->get();
+        $topUrls = $query->where('visits', '>', 0)
+            ->orderBy('visits', 'desc')
+            ->limit(5)
+            ->get();
 
         // Genel istatistikler
         $generalStats = [
@@ -98,17 +92,9 @@ class UrlShortenerController extends Controller
             'total_visits' => $query->sum('visits'),
             'avg_visits' => round($query->where('visits', '>', 0)->avg('visits') ?? 0, 2),
             'urls_without_visits' => $query->where('visits', 0)->count(),
-            'most_visited_today' => $query->select([
-                'id',
-                'original_url',
-                'short_code',
-                'visits',
-                'created_at',
-                'updated_at'
-            ])
-            ->whereDate('updated_at', today())
-            ->orderBy('visits', 'desc')
-            ->first(),
+            'most_visited_today' => $query->whereDate('updated_at', today())
+                ->orderBy('visits', 'desc')
+                ->first(),
             'total_visits_today' => $query->whereDate('updated_at', today())
                 ->sum('visits'),
         ];
