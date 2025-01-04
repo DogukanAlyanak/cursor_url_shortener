@@ -1,0 +1,23 @@
+:root{
+  --color1: #D202FF;
+  --color2: #FF4E73;
+  --color3: #5b4dc1;
+  --color-st-1: #A202C5;
+  --color-st-2: #2C043E;
+  --sidebar: #120e29;
+  --bg: #f3f5fa;
+  --color: #000;
+  --link: #000;
+  --linkhover: var(--color1);
+  --bgalt: #f0f5f9;
+  --card: #fff;
+}
+[data-scheme=dark]:root{
+  --bg: #0f172a;
+  --link: #fff;
+  --linkhover: var(--color1);
+  --color: #fff;
+  --bgalt: #0e1627;
+  --card: #1f283f;
+  --sidebar: #26304a;
+}
