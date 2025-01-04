@@ -3,6 +3,7 @@
 @section('title', 'URL İstatistikleri')
 
 @section('content')
+@auth
 <div class="row justify-content-center">
     <!-- İstatistik Kartları -->
     <div class="col-md-3 mb-4">
@@ -83,6 +84,11 @@
                                             title="URL'yi Kopyala">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
+                                    <!-- Safari için gizli input -->
+                                    <input type="text" 
+                                           value="{{ route('urls.redirect', $url->short_code) }}" 
+                                           class="copy-input"
+                                           style="position: absolute; left: -9999px;">
                                 </td>
                             </tr>
                             @endforeach
@@ -124,6 +130,23 @@
         </div>
     </div>
 </div>
+@else
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-lock display-1 text-muted mb-3"></i>
+                <h4>İstatistikleri Görüntülemek İçin Giriş Yapın</h4>
+                <p class="text-muted">URL istatistiklerini görüntülemek için lütfen giriş yapın veya kayıt olun.</p>
+                <div class="mt-4">
+                    <a href="{{ route('login') }}" class="btn btn-primary me-2">Giriş Yap</a>
+                    <a href="{{ route('register') }}" class="btn btn-outline-primary">Kayıt Ol</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endauth
 
 @push('scripts')
 <script>
@@ -136,13 +159,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Kopyalama butonlarını ayarla
     document.querySelectorAll('.copy-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             const url = this.getAttribute('data-url');
-            navigator.clipboard.writeText(url).then(() => {
-                // Tooltip metnini güncelle
-                const tooltip = bootstrap.Tooltip.getInstance(this);
-                const originalTitle = this.getAttribute('data-bs-original-title');
-                
+            const tooltip = bootstrap.Tooltip.getInstance(this);
+            const originalTitle = this.getAttribute('data-bs-original-title');
+
+            try {
+                // Modern tarayıcılar için Clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    // Safari ve güvenli olmayan bağlamlar için fallback
+                    const input = this.parentElement.querySelector('.copy-input');
+                    input.select();
+                    document.execCommand('copy');
+                }
+
+                // Başarılı kopyalama geri bildirimi
                 this.setAttribute('data-bs-original-title', 'Kopyalandı!');
                 tooltip.show();
 
@@ -151,9 +184,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.setAttribute('data-bs-original-title', originalTitle);
                     tooltip.hide();
                 }, 2000);
-            }).catch(err => {
+            } catch (err) {
                 console.error('URL kopyalanamadı:', err);
-            });
+                // Hata durumunda kullanıcıya bildir
+                this.setAttribute('data-bs-original-title', 'Kopyalanamadı!');
+                tooltip.show();
+                setTimeout(() => {
+                    this.setAttribute('data-bs-original-title', originalTitle);
+                    tooltip.hide();
+                }, 2000);
+            }
         });
     });
 });

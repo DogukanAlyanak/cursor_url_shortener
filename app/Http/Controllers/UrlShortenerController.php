@@ -12,9 +12,16 @@ class UrlShortenerController extends Controller
 {
     public function index()
     {
-        $urls = Auth::check()
-            ? ShortUrl::where('user_id', Auth::id())->latest()->paginate(10)
-            : ShortUrl::latest()->paginate(10);
+        if (Auth::check()) {
+            $urls = ShortUrl::where('user_id', Auth::id())->latest()->paginate(10);
+        } else {
+            // Ziyaretçiler için session'da saklanan son URL'yi getir
+            $lastShortCode = session('last_short_code');
+            $urls = $lastShortCode 
+                ? ShortUrl::where('short_code', $lastShortCode)->get() 
+                : collect();
+        }
+        
         $theme = config('theme.active', 'tema_1');
         return view("themes.{$theme}.urls.index", compact('urls'));
     }
@@ -37,6 +44,11 @@ class UrlShortenerController extends Controller
             'visits' => 0,
             'user_id' => Auth::check() ? Auth::id() : null
         ]);
+
+        // Ziyaretçiler için son oluşturulan URL'nin kodunu session'da sakla
+        if (!Auth::check()) {
+            session(['last_short_code' => $shortUrl->short_code]);
+        }
 
         return redirect()->route('urls.index')
             ->with('success', 'URL başarıyla kısaltıldı!');

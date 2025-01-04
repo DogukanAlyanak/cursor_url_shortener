@@ -56,13 +56,20 @@
                                                 title="URL'yi Kopyala">
                                             <i class="bi bi-clipboard"></i>
                                         </button>
+                                        <!-- Safari için gizli input -->
+                                        <input type="text" 
+                                               value="{{ route('urls.redirect', $url->short_code) }}" 
+                                               class="copy-input"
+                                               style="position: absolute; left: -9999px;">
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                    {{ $urls->links() }}
+                    @auth
+                        {{ $urls->links() }}
+                    @endauth
                 @endif
             </div>
         </div>
@@ -80,13 +87,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Kopyalama butonlarını ayarla
     document.querySelectorAll('.copy-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             const url = this.getAttribute('data-url');
-            navigator.clipboard.writeText(url).then(() => {
-                // Tooltip metnini güncelle
-                const tooltip = bootstrap.Tooltip.getInstance(this);
-                const originalTitle = this.getAttribute('data-bs-original-title');
-                
+            const tooltip = bootstrap.Tooltip.getInstance(this);
+            const originalTitle = this.getAttribute('data-bs-original-title');
+
+            try {
+                // Modern tarayıcılar için Clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    // Safari ve güvenli olmayan bağlamlar için fallback
+                    const input = this.parentElement.querySelector('.copy-input');
+                    input.select();
+                    document.execCommand('copy');
+                }
+
+                // Başarılı kopyalama geri bildirimi
                 this.setAttribute('data-bs-original-title', 'Kopyalandı!');
                 tooltip.show();
 
@@ -95,9 +112,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.setAttribute('data-bs-original-title', originalTitle);
                     tooltip.hide();
                 }, 2000);
-            }).catch(err => {
+            } catch (err) {
                 console.error('URL kopyalanamadı:', err);
-            });
+                // Hata durumunda kullanıcıya bildir
+                this.setAttribute('data-bs-original-title', 'Kopyalanamadı!');
+                tooltip.show();
+                setTimeout(() => {
+                    this.setAttribute('data-bs-original-title', originalTitle);
+                    tooltip.hide();
+                }, 2000);
+            }
         });
     });
 });
