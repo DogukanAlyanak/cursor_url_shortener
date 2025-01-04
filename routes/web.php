@@ -20,9 +20,11 @@ Route::post('logout', LogoutController::class)->name('logout')->middleware('auth
 Route::get('/', [UrlShortenerController::class, 'index'])->name('urls.index');
 Route::get('/create', [UrlShortenerController::class, 'create'])->name('urls.create');
 Route::post('/store', [UrlShortenerController::class, 'store'])->name('urls.store');
-Route::get('/{shortCode}', [UrlShortenerController::class, 'redirect'])->name('urls.redirect');
 
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
     Route::get('/reports', [UrlShortenerController::class, 'reports'])->name('urls.reports');
 });
+
+// Catch-all route for short URLs - must be last
+Route::get('/{shortCode}', [UrlShortenerController::class, 'redirect'])->name('urls.redirect');
