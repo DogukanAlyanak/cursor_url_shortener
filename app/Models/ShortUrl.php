@@ -9,6 +9,12 @@ class ShortUrl extends Model
     protected $fillable = [
         'original_url',
         'short_code',
-        'visits'
+        'visits',
+        'user_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

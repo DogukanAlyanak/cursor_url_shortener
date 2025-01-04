@@ -8,26 +8,18 @@
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">URL Listesi</h5>
-                @auth
                 <a href="{{ route('urls.create') }}" class="btn btn-light btn-sm">
                     <i class="bi bi-plus-lg"></i> Yeni URL Ekle
                 </a>
-                @endauth
             </div>
             <div class="card-body">
                 @if($urls->isEmpty())
                     <div class="text-center py-5">
                         <i class="bi bi-link-45deg display-1 text-muted"></i>
                         <p class="mt-3">Henüz hiç kısaltılmış URL bulunmuyor.</p>
-                        @auth
-                            <a href="{{ route('urls.create') }}" class="btn btn-primary">
-                                İlk URL'nizi Kısaltın
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-primary">
-                                URL Kısaltmak için Giriş Yapın
-                            </a>
-                        @endauth
+                        <a href="{{ route('urls.create') }}" class="btn btn-primary">
+                            İlk URL'nizi Kısaltın
+                        </a>
                     </div>
                 @else
                     <div class="table-responsive">

@@ -19,8 +19,6 @@ Route::post('logout', LogoutController::class)->name('logout')->middleware('auth
 // URL Shortener Routes
 Route::get('/', [UrlShortenerController::class, 'index'])->name('urls.index');
 Route::get('/reports', [UrlShortenerController::class, 'reports'])->name('urls.reports');
-Route::middleware('auth')->group(function () {
-    Route::get('/create', [UrlShortenerController::class, 'create'])->name('urls.create');
-    Route::post('/store', [UrlShortenerController::class, 'store'])->name('urls.store');
-});
+Route::get('/create', [UrlShortenerController::class, 'create'])->name('urls.create');
+Route::post('/store', [UrlShortenerController::class, 'store'])->name('urls.store');
 Route::get('/{shortCode}', [UrlShortenerController::class, 'redirect'])->name('urls.redirect');
