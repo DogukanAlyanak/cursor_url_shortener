@@ -47,7 +47,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#">
-                        <img src="https://demo.gempixel.com/saastheme/content/logo-white.png"
+                        <img src="https://softeast.net/assets/common/images/branding/project_logo_light_256.png"
                             alt="URL Kısaltıcı - Premium SaaS Teması">
                     </a>
                     <button class="navbar-toggler d-block d-sm-none float-end" type="button" data-toggle="collapse"
@@ -58,16 +58,18 @@
                 </div>
                 <div id="mainmenu" class="navbar-collapse">
                     <ul class="nav me-auto mb-2">
-                        <li class="dropdown mt-0">
-                            <a href="#" data-bs-toggle="dropdown">Çözümler</a>
+                        <li><a href="{{ route('urls.index') }}" class="{{ request()->routeIs('urls.index') ? 'active' : '' }}">Ana Sayfa</a></li>
+                        <li><a href="{{ route('urls.reports') }}" class="{{ request()->routeIs('urls.reports') ? 'active' : '' }}">İstatistikler</a></li>
+                        {{-- <li class="dropdown mt-0">
+                            <a href="#" data-bs-toggle="dropdown">Yardım</a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="list-group-item border-0">
                                         <div class="media d-flex">
                                             <div class="media-body">
                                                 <a href="#"
-                                                    class="d-block h6 mb-0 ps-0">QR Kodları</a>
-                                                <small class="text-sm text-muted mb-0">Özelleştirilebilir ve takip edilebilir QR kodları</small>
+                                                    class="d-block h6 mb-0 ps-0">Nasıl Kullanılır?</a>
+                                                <small class="text-sm text-muted mb-0">URL kısaltma hakkında detaylı bilgi</small>
                                             </div>
                                         </div>
                                     </div>
@@ -77,45 +79,47 @@
                                         <div class="media d-flex">
                                             <div class="media-body">
                                                 <a href="#"
-                                                    class="d-block h6 mb-0 ps-0">Bio Sayfaları</a>
-                                                <small class="text-sm text-muted mb-0">Sosyal medya takipçilerinizi dönüştürün</small>
+                                                    class="d-block h6 mb-0 ps-0">SSS</a>
+                                                <small class="text-sm text-muted mb-0">Sıkça sorulan sorular</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="list-group-item border-0">
+                                        <div class="media d-flex">
+                                            <div class="media-body">
+                                                <a href="#"
+                                                    class="d-block h6 mb-0 ps-0">İletişim</a>
+                                                <small class="text-sm text-muted mb-0">Bizimle iletişime geçin</small>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
                             </ul>
-                        </li>
-                        <li><a href="#">Fiyatlandırma</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li class="dropdown mt-0">
-                            <a href="#" data-bs-toggle="dropdown">Kaynaklar</a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <div class="list-group-item border-0">
-                                        <div class="media d-flex">
-                                            <div class="media-body">
-                                                <a href="#"
-                                                    class="d-block h6 mb-0">Geliştirici API</a>
-                                                <small class="text-sm text-muted mb-0">API kullanım kılavuzu</small>
+                        </li> --}}
+                        @auth
+                            <li class="dropdown mt-0">
+                                <a href="#" data-bs-toggle="dropdown">{{ Auth::user()->name }}</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <div class="list-group-item border-0">
+                                            <div class="media d-flex">
+                                                <div class="media-body">
+                                                    <form action="{{ route('logout') }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-link d-block h6 mb-0 ps-0 text-decoration-none">Çıkış Yap</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="list-group-item border-0">
-                                        <div class="media d-flex">
-                                            <div class="media-body">
-                                                <a href="#"
-                                                    class="d-block h6 mb-0">Yardım Merkezi</a>
-                                                <small class="text-sm text-muted mb-0">Yardım merkezimizi ziyaret edin</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li><a href="#">Giriş Yap</a></li>
-                        <li><a class="active" href="#">Başla</a></li>
+                                    </li>
+                                </ul>
+                            </li>
+                        @else
+                            <li><a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Giriş Yap</a></li>
+                            <li><a href="{{ route('register') }}" class="{{ request()->routeIs('register') ? 'active' : '' }}">Kayıt Ol</a></li>
+                        @endauth
                     </ul>
                 </div>
             </div>
@@ -154,34 +158,91 @@
                     <p>Aracımız, basit ve akılda kalıcı ama güçlü linklerle kitlenizi sorunsuz bir şekilde takip etmenizi ve müşterilerinize benzersiz bir deneyim sunmanızı sağlar.</p>
 
                     <div class="shortener-simple">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+                            </div>
+                        @endif
                         <div class="share-this"></div>
                         <div class="ajax"></div>
-                        <form action="#" id="main-form"
-                            class="shadow-sm rounded" data-trigger="shorten-form" role="form" method="post">
+                        <form action="{{ route('urls.store') }}" id="main-form"
+                            class="shadow-sm rounded" role="form" method="POST">
+                            @csrf
                             <div class="main-form position-relative">
                                 <div class="row">
                                     <div class="col-11">
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-link mt-3"></i></span>
-                                            <input type="text" class="form-control main-input" name="url"
-                                                id="url" value=""
-                                                placeholder="https://youtube.com/watch?v=RdbnKbSXiA"
-                                                autocomplete="off" />
+                                            <input type="text" class="form-control main-input" name="original_url"
+                                                id="url" value="{{ old('original_url') }}"
+                                                placeholder="https://youtube.com/watch?v=xxxxxxxx"
+                                                autocomplete="off" required />
                                         </div>
                                     </div>
                                     <div class="col-1">
-                                        <button class="btn btn-primary main-button d-none"
-                                            type="button"><span>Kopyala</span><i class="fa fa-clipboard"></i></button>
-                                        <button class="btn btn-secondary main-button" type="submit"><span>Kısalt</span> <i class="fa fa-link"></i></button>
+                                        <button class="btn btn-primary main-button copy-button d-none"
+                                            type="button" onclick="copyToClipboard()"><span>Kopyala</span><i class="fa fa-clipboard"></i></button>
+                                        <button class="btn btn-secondary main-button submit-button" type="submit"><span>Kısalt</span> <i class="fa fa-link"></i></button>
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" value="d41d8cd98f00b204e9800998ecf8427e">
                         </form>
                     </div>
 
-                    <a href="#" class="btn btn-primary">Hemen Başla</a>
-                    <a href="#mainto" class="btn btn-transparent scroll">Daha Fazla Bilgi</a>
+                    @if(isset($urls) && $urls->count() > 0)
+                        <div class="mt-4">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Kısa URL</th>
+                                            <th>Orijinal URL</th>
+                                            <th>Ziyaret</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($urls as $url)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ route('urls.redirect', $url->short_code) }}" target="_blank">
+                                                    {{ route('urls.redirect', $url->short_code) }}
+                                                </a>
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 300px;">
+                                                <a href="{{ $url->original_url }}" target="_blank">
+                                                    {{ $url->original_url }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $url->visits }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary" 
+                                                        onclick="copyToClipboard('{{ route('urls.redirect', $url->short_code) }}')"
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top" 
+                                                        title="URL'yi Kopyala">
+                                                    <i class="fa fa-clipboard"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if(method_exists($urls, 'links'))
+                                <div class="d-flex justify-content-center">
+                                    {{ $urls->links() }}
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -190,7 +251,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-5">
-                    <p>2025 &copy; URL Kısaltıcı - Premium SaaS Teması.</p>
+                    <p>2025 &copy; URL Kısaltıcı - Softeast.net Ürünüdür.</p>
                 </div>
                 <div class="col-sm-7 text-end">
                     <a href="#" title="Kullanım Koşulları">Kullanım Koşulları</a>
@@ -228,6 +289,70 @@
                 "lm": "Geçen Ay"
             }
         }
+
+        // URL kopyalama fonksiyonu
+        async function copyToClipboard(text) {
+            try {
+                if (!text) {
+                    text = document.getElementById('url').value;
+                }
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                    showToast('URL başarıyla kopyalandı!', 'success');
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast('URL başarıyla kopyalandı!', 'success');
+                    } catch (err) {
+                        showToast('URL kopyalanamadı!', 'error');
+                    }
+                    document.body.removeChild(textArea);
+                }
+            } catch (err) {
+                showToast('URL kopyalanamadı!', 'error');
+            }
+        }
+
+        // Toast mesajı gösterme fonksiyonu
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed bottom-0 end-0 m-3`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            // 3 saniye sonra toast'ı kaldır
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Form submit işlemi
+        document.getElementById('main-form').addEventListener('submit', function(e) {
+            const urlInput = document.getElementById('url');
+            if (!urlInput.value) {
+                e.preventDefault();
+                showToast('Lütfen bir URL girin!', 'error');
+            }
+        });
+
+        // Typed.js animasyonu
+        var typed = new Typed('.forPeople', {
+            strings: lang.typed,
+            typeSpeed: 50,
+            backSpeed: 30,
+            backDelay: 2000,
+            loop: true
+        });
     </script>
     <script>
         feather.replace({
